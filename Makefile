@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Iinclude
-SRC = src/lexer.c
-TEST_SRC = tests/test_lexer.c
+SRC = src/lexer.c src/parser.c src/runtime.c
+TEST_SRC = tests/test_parser.c
 OBJ = $(SRC:.c=.o)
 TARGET = eaC
 
@@ -10,8 +10,8 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
 
-test-lexer:
-	$(CC) $(CFLAGS) $(TEST_SRC) src/lexer.c -o test_lexer && ./test_lexer
+test-parser:
+	$(CC) $(CFLAGS) $(TEST_SRC) $(SRC) -o test_parser && ./test_parser
 
 clean:
-	rm -f $(OBJ) $(TARGET) test_lexer
+	rm -f $(OBJ) $(TARGET) test_parser
