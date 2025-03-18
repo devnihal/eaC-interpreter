@@ -32,6 +32,7 @@ int main() {
     printf("Source Code:\n%s\n\nTokens:\n", source);
 
     Token *tokens = lex(source);
+    print_token(tokens);
     for (int i = 0; tokens[i].type != TOKEN_EOF; i++) {
         print_token(&tokens[i]);
     }

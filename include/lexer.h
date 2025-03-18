@@ -8,13 +8,13 @@
 
 // Enum for token types
 typedef enum {
-    TOKEN_KEYWORD,     // Keywords like 'plant', 'seal', 'when', etc.
-    TOKEN_IDENTIFIER,  // Variable names or function names
-    TOKEN_NUMBER,      // Numeric literals (e.g., 42, 3.14)
-    TOKEN_STRING,      // String literals (e.g., "hello")
-    TOKEN_OPERATOR,    // Operators like +, -, *, /, etc.
-    TOKEN_PUNCTUATION, // Punctuation like {, }, (, ), ;
-    TOKEN_EOF          // End of file marker
+    TOKEN_EOF,
+    TOKEN_KEYWORD,
+    TOKEN_IDENTIFIER,
+    TOKEN_NUMBER,
+    TOKEN_STRING,
+    TOKEN_OPERATOR,
+    TOKEN_PUNCTUATION
 } TokenType;
 
 // Struct for a token

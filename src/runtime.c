@@ -77,6 +77,26 @@ RuntimeValue evaluate(ASTNode *node) {
             result = value;
             break;
         }
+        case NODE_CONDITIONAL: {
+            RuntimeValue condition = evaluate(node->conditional.condition);
+            if (condition.type != VALUE_BOOL) {
+                fprintf(stderr, "Error: Conditional requires a boolean condition\n");
+                exit(1);
+            }
+            if (condition.boolean) {
+                evaluate(node->conditional.then_block);
+            } else if (node->conditional.else_block) {
+                evaluate(node->conditional.else_block);
+            }
+            break;
+        }
+
+        case NODE_LOOP: {
+            while (1) {
+                evaluate(node->loop.body);
+            }
+            break;
+        }
 
         default:
             fprintf(stderr, "Error: Unsupported AST node type\n");

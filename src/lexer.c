@@ -38,8 +38,17 @@ Token *lex(const char *source) {
         if (is_identifier_start(*ptr)) {
             const char *start = ptr;
             while (is_identifier_char(*ptr)) ptr++;
-            tokens[token_count].type = TOKEN_IDENTIFIER;
-            tokens[token_count].value = strndup(start, ptr - start);
+            char *value = strndup(start, ptr - start);
+
+            // Check for specific keywords
+            if (strcmp(value, "plant") == 0 || strcmp(value, "when") == 0 ||
+                strcmp(value, "otherwise") == 0 || strcmp(value, "loop") == 0 ||
+                strcmp(value, "break") == 0 || strcmp(value, "skip") == 0) {
+                tokens[token_count].type = TOKEN_KEYWORD; // Ensure this is correctly defined
+            } else {
+                tokens[token_count].type = TOKEN_IDENTIFIER;
+            }
+            tokens[token_count].value = value;
             token_count++;
             continue;
         }
