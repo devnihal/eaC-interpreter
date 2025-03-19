@@ -3,26 +3,25 @@
 
 #include "ast.h"
 
-// Enum for runtime value types
-typedef enum {
-    VALUE_NUMBER,
-    VALUE_STRING,
-    VALUE_BOOL
-} ValueType;
+#define MAX_SYMBOLS 100
 
-// Struct for runtime values
 typedef struct {
-    ValueType type;
-    union {
-        double number;
-        char *string;
-        int boolean;
-    };
-} RuntimeValue;
+    char *name;
+    double value;
+} Symbol;
+
+typedef struct {
+    Symbol symbols[MAX_SYMBOLS];
+    int count;
+    int break_flag;
+} Environment;
 
 // Function prototypes
-RuntimeValue evaluate(ASTNode *node); // Evaluate an AST node
-void init_runtime();                  // Initialize the runtime environment
-void free_runtime();                  // Free allocated memory
+void init_environment(Environment *env);
+void set_variable(Environment *env, const char *name, double value);
+double get_variable(Environment *env, const char *name);
+double interpret(ASTNode *node, Environment *env);
+void interpret_statement(ASTNode *node, Environment *env);
+double interpret_expression(ASTNode *node, Environment *env);
 
 #endif // RUNTIME_H

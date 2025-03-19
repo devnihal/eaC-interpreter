@@ -9,6 +9,7 @@
         "tuple": "c",
         "type_traits": "c",
         "utility": "c",
-        "lexer.h": "c"
+        "lexer.h": "c",
+        "stdlib.h": "c"
     }
 }

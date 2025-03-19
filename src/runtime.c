@@ -1,119 +1,129 @@
 #include "runtime.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
+#define MAX_SYMBOLS 100
 
-// Symbol table (for simplicity, use a fixed-size array)
-#define SYMBOL_TABLE_SIZE 100
-typedef struct {
-    char *name;
-    RuntimeValue value;
-} SymbolTableEntry;
+// Forward declarations
+double interpret(ASTNode *node, Environment *env);
+void interpret_statement(ASTNode *node, Environment *env);
+double interpret_expression(ASTNode *node, Environment *env);
 
-SymbolTableEntry symbol_table[SYMBOL_TABLE_SIZE];
-int symbol_table_size = 0;
+// Initialize the environment
+void init_environment(Environment *env) {
+    env->count = 0;
+    env->break_flag = 0;
+}
 
-// Helper function to find a variable in the symbol table
-RuntimeValue *lookup_variable(const char *name) {
-    for (int i = 0; i < symbol_table_size; i++) {
-        if (strcmp(symbol_table[i].name, name) == 0) {
-            return &symbol_table[i].value;
+// Add or update a variable in the environment
+void set_variable(Environment *env, const char *name, double value) {
+    for (int i = 0; i < env->count; i++) {
+        if (strcmp(env->symbols[i].name, name) == 0) {
+            env->symbols[i].value = value;
+            return;
+        }
+    }
+    if (env->count >= MAX_SYMBOLS) {
+        fprintf(stderr, "Error: Too many variables\n");
+        exit(1);
+    }
+    env->symbols[env->count].name = strdup(name);
+    env->symbols[env->count].value = value;
+    env->count++;
+}
+
+// Get the value of a variable from the environment
+double get_variable(Environment *env, const char *name) {
+    for (int i = 0; i < env->count; i++) {
+        if (strcmp(env->symbols[i].name, name) == 0) {
+            return env->symbols[i].value;
         }
     }
     fprintf(stderr, "Error: Undefined variable '%s'\n", name);
     exit(1);
 }
-
-// Helper function to add a variable to the symbol table
-void define_variable(const char *name, RuntimeValue value) {
-    if (symbol_table_size >= SYMBOL_TABLE_SIZE) {
-        fprintf(stderr, "Error: Symbol table overflow\n");
-        exit(1);
-    }
-    symbol_table[symbol_table_size].name = strdup(name);
-    symbol_table[symbol_table_size].value = value;
-    symbol_table_size++;
-}
-
-// Evaluate an AST node
-RuntimeValue evaluate(ASTNode *node) {
-    RuntimeValue result;
-
+// Evaluate expressions
+double interpret_expression(ASTNode *node, Environment *env) {
     switch (node->type) {
         case NODE_NUMBER:
-            result.type = VALUE_NUMBER;
-            result.number = node->number;
-            break;
-
+            return node->number;
         case NODE_IDENTIFIER:
-            result = *lookup_variable(node->identifier);
-            break;
-
-        case NODE_BINARY_OP: {
-            RuntimeValue left = evaluate(node->binary_op.left);
-            RuntimeValue right = evaluate(node->binary_op.right);
-
-            if (left.type != VALUE_NUMBER || right.type != VALUE_NUMBER) {
-                fprintf(stderr, "Error: Binary operation requires numeric operands\n");
-                exit(1);
-            }
-
-            result.type = VALUE_NUMBER;
+            return get_variable(env, node->identifier);
+        case NODE_BINARY_OP:
+            double left = interpret_expression(node->binary_op.left, env);
+            double right = interpret_expression(node->binary_op.right, env);
             switch (node->binary_op.operator) {
-                case '+': result.number = left.number + right.number; break;
-                case '-': result.number = left.number - right.number; break;
-                case '*': result.number = left.number * right.number; break;
-                case '/': result.number = left.number / right.number; break;
+                case '+': return left + right;
+                case '-': return left - right;
+                case '*': return left * right;
+                case '/': return left / right;
+                case '>': return left > right ? 1 : 0;
+                case '<': return left < right ? 1 : 0;
+                case '=': return left == right ? 1 : 0;
                 default:
                     fprintf(stderr, "Error: Unsupported operator '%c'\n", node->binary_op.operator);
                     exit(1);
             }
-            break;
-        }
-
+        default:
+            fprintf(stderr, "Error: Unsupported expression type\n");
+            exit(1);
+    }
+}
+// Execute statements
+void interpret_statement(ASTNode *node, Environment *env) {
+    switch (node->type) {
         case NODE_ASSIGNMENT: {
-            RuntimeValue value = evaluate(node->assignment.value);
-            define_variable(node->assignment.identifier, value);
-            result = value;
+            double value = interpret_expression(node->assignment.value, env);
+            set_variable(env, node->assignment.identifier, value);
             break;
         }
         case NODE_CONDITIONAL: {
-            RuntimeValue condition = evaluate(node->conditional.condition);
-            if (condition.type != VALUE_BOOL) {
-                fprintf(stderr, "Error: Conditional requires a boolean condition\n");
-                exit(1);
-            }
-            if (condition.boolean) {
-                evaluate(node->conditional.then_block);
+            double condition = interpret_expression(node->conditional.condition, env);
+            if (condition) {
+                interpret(node->conditional.then_block, env);
             } else if (node->conditional.else_block) {
-                evaluate(node->conditional.else_block);
+                interpret(node->conditional.else_block, env);
             }
             break;
         }
-
         case NODE_LOOP: {
             while (1) {
-                evaluate(node->loop.body);
+                interpret(node->loop.body, env);
+
+                // Exit the loop if a break statement was encountered
+                if (env->break_flag) {
+                    env->break_flag = 0; // Reset the break flag
+                    break;
+                }
             }
             break;
         }
+        case NODE_BREAK: {
+            env->break_flag = 1; // Set the break flag
+            break;
+        }
+        default: {
+            fprintf(stderr, "Error: Unsupported statement type\n");
+            exit(1);
+        }
+    }
+}
 
+// Interpret the entire program
+double interpret(ASTNode *node, Environment *env) {
+    switch (node->type) {
+        case NODE_PROGRAM:
+            for (int i = 0; i < node->program.statement_count; i++) {
+                interpret_statement(node->program.statements[i], env);
+            }
+            break;
+        case NODE_BLOCK:
+            for (int i = 0; i < node->block.statement_count; i++) {
+                interpret_statement(node->block.statements[i], env);
+            }
+            break;
         default:
-            fprintf(stderr, "Error: Unsupported AST node type\n");
+            fprintf(stderr, "Error: Unsupported node type in interpreter\n");
             exit(1);
     }
-
-    return result;
-}
-
-// Initialize the runtime environment
-void init_runtime() {
-    symbol_table_size = 0;
-}
-
-// Free allocated memory
-void free_runtime() {
-    for (int i = 0; i < symbol_table_size; i++) {
-        free(symbol_table[i].name);
-    }
+    return 0; // Return value is unused for now
 }
