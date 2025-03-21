@@ -1,3 +1,52 @@
+# Ignore object files and compiled binaries
 *.o
+*.out
+*.exe
+*.bin
+*.elf
+
+# Ignore the eaC executable
 eaC
+
+# Ignore test binaries
 test_lexer
+test_parser
+test_runtime
+
+# Ignore build directories
+/build/
+/dist/
+*.dSYM/ # macOS debug symbols
+*.obj   # Windows object files
+
+# Ignore logs and debugging files
+*.log
+*.trace
+
+# Ignore dependency files
+*.dep
+*.d
+
+# Ignore editor and IDE files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Ignore macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Ignore Linux system files
+*~
+.nfs*
+
+# Ignore Python virtual environments (if used for scripting)
+venv/
+__pycache__/
+*.pyc
+*.pyo
