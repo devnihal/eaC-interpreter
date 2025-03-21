@@ -6,7 +6,6 @@
 - **👨‍💻 Mohammed Nihal** ([@devnihal](https://github.com/devnihal)) – **Creator & Lead Developer** 🚀  
 
 ### 💻 Development Team  
--
 -  **🧑🏻‍💻 Fathima Nadha** ([@nadha24](https://github.com/nadha24)) – Co-Developer 💡
 
 -  **🧑🏻‍💻 Ajai Bhaskar** ([@ajaiaju39](https://github.com/ajaiaju39)) – Co-Developer 💡  
