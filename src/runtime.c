@@ -12,6 +12,7 @@ double interpret_expression(ASTNode *node, Environment *env);
 void init_environment(Environment *env) {
     env->count = 0;
     env->break_flag = 0;
+    env->continue_flag = 0;
 }
 
 // Add or update a variable in the environment
@@ -94,11 +95,21 @@ void interpret_statement(ASTNode *node, Environment *env) {
                     env->break_flag = 0; // Reset the break flag
                     break;
                 }
+
+                // Continue to the next iteration if a continue statement was encountered
+                if (env->continue_flag) {
+                    env->continue_flag = 0; // Reset the continue flag
+                    continue;
+                }
             }
             break;
         }
         case NODE_BREAK: {
             env->break_flag = 1; // Set the break flag
+            break;
+        }
+        case NODE_CONTINUE: {
+            env->continue_flag = 1; // Set the continue flag
             break;
         }
         default: {

@@ -9,6 +9,22 @@ int match_token(Token *token, TokenType type, const char *value) {
     return token->type == type && (value == NULL || strcmp(token->value, value) == 0);
 }
 // Main parser function
+ASTNode *parse_continue(Token **tokens) {
+    ASTNode *node = malloc(sizeof(ASTNode));
+    node->type = NODE_CONTINUE;
+
+    (*tokens)++; // Skip "continue"
+
+    // Ensure the statement ends with a semicolon
+    Token *current = (*tokens);
+    if (!match_token(current, TOKEN_PUNCTUATION, ";")) {
+        fprintf(stderr, "Error: Expected ';' after continue statement\n");
+        exit(1);
+    }
+    (*tokens)++; // Skip ";"
+
+    return node;
+}
 ASTNode *parse(Token *tokens) {
     ASTNode *program_node = malloc(sizeof(ASTNode));
     program_node->type = NODE_PROGRAM;
@@ -31,9 +47,7 @@ ASTNode *parse(Token *tokens) {
 ASTNode *parse_expression(Token **tokens) {
     Token *current = (*tokens);
 
-    printf("Parsing expression: Type=%d, Value='%s'\n", current->type, current->value ? current->value : "NULL");
-
-    // Parse the left-hand side (primary expression: identifier or number)
+    // Parse left-hand side (identifier or number)
     ASTNode *left = malloc(sizeof(ASTNode));
     if (match_token(current, TOKEN_IDENTIFIER, NULL)) {
         left->type = NODE_IDENTIFIER;
@@ -48,24 +62,22 @@ ASTNode *parse_expression(Token **tokens) {
         exit(1);
     }
 
-    // Check for binary operator (e.g., + in "x + 5")
+    // Check for binary operators
     current = (*tokens);
     while (match_token(current, TOKEN_OPERATOR, NULL)) {
+        // Reject '=' in expressions (only allowed in assignments)
+        if (strcmp(current->value, "=") == 0) {
+            fprintf(stderr, "Error: '=' is not allowed in expressions\n");
+            exit(1);
+        }
+
         ASTNode *node = malloc(sizeof(ASTNode));
         node->type = NODE_BINARY_OP;
         node->binary_op.operator = current->value[0];
-        (*tokens)++; // Advance past the operator
-
-        printf("Found operator: '%c'\n", node->binary_op.operator);
-
-        // Parse the right-hand side (must be another expression)
+        (*tokens)++;
         node->binary_op.left = left;
         node->binary_op.right = parse_expression(tokens);
-
-        // Update the left-hand side to the new binary operation node
         left = node;
-
-        // Move to the next token
         current = (*tokens);
     }
 
@@ -75,8 +87,6 @@ ASTNode *parse_expression(Token **tokens) {
 ASTNode *parse_statement(Token **tokens) {
     Token *current = (*tokens);
 
-    printf("Parsing statement: Type=%d, Value='%s'\n", current->type, current->value ? current->value : "NULL");
-
     if (match_token(current, TOKEN_KEYWORD, "when")) {
         return parse_conditional(tokens);
     } else if (match_token(current, TOKEN_KEYWORD, "loop")) {
@@ -85,6 +95,8 @@ ASTNode *parse_statement(Token **tokens) {
         return parse_assignment(tokens);
     } else if (match_token(current, TOKEN_KEYWORD, "break")) {
         return parse_break(tokens);
+    } else if (match_token(current, TOKEN_KEYWORD, "continue")) { // Ensure this exists
+        return parse_continue(tokens);
     } else {
         fprintf(stderr, "Error: Unsupported statement\n");
         exit(1);

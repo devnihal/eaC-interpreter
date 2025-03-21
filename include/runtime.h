@@ -14,6 +14,7 @@ typedef struct {
     Symbol symbols[MAX_SYMBOLS];
     int count;
     int break_flag;
+    int continue_flag;
 } Environment;
 
 // Function prototypes

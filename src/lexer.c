@@ -43,8 +43,9 @@ Token *lex(const char *source) {
             // Check for specific keywords
             if (strcmp(value, "plant") == 0 || strcmp(value, "when") == 0 ||
                 strcmp(value, "otherwise") == 0 || strcmp(value, "loop") == 0 ||
-                strcmp(value, "break") == 0 || strcmp(value, "skip") == 0) {
-                tokens[token_count].type = TOKEN_KEYWORD; // Ensure this is correctly defined
+                strcmp(value, "break") == 0 || strcmp(value, "skip") == 0 ||
+                strcmp(value, "continue") == 0) { // Add this line
+                tokens[token_count].type = TOKEN_KEYWORD;
             } else {
                 tokens[token_count].type = TOKEN_IDENTIFIER;
             }
@@ -54,10 +55,18 @@ Token *lex(const char *source) {
         }
 
         // Check for operators
-        if (strchr("+-*/%<>=!&|", *ptr)) {
-            tokens[token_count].type = TOKEN_OPERATOR;
-            tokens[token_count].value = strndup(ptr, 1);
-            ptr++;
+        if (strchr("><=!+-*/", *ptr)) {
+            // Check for multi-character operators
+            if ((*ptr == '=' && *(ptr + 1) == '=') || 
+                (*ptr == '!' && *(ptr + 1) == '=')) {
+                tokens[token_count].type = TOKEN_OPERATOR;
+                tokens[token_count].value = strndup(ptr, 2); // Capture 2 characters
+                ptr += 2; // Advance by 2
+            } else {
+                tokens[token_count].type = TOKEN_OPERATOR;
+                tokens[token_count].value = strndup(ptr, 1); // Capture 1 character
+                ptr++;
+            }
             token_count++;
             continue;
         }

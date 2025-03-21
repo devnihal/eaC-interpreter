@@ -6,8 +6,7 @@
 
 int main() {
     // Example source code
-    const char *source_code = "when 1 > 0 { plant x = 42; } otherwise { plant y = 0; } loop { plant z = 10; break; }";
-
+    const char *source_code = "plant z = 0; loop { plant z = z + 1; when z == 5 { continue; } plant w = z; break; }";
     // Tokenize
     Token *tokens = lex(source_code); // Use lex() instead of tokenize()
 

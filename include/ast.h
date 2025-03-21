@@ -4,16 +4,16 @@
 #include "lexer.h"
 
 typedef enum {
-    NODE_PROGRAM,      // Root node containing all statements
-    NODE_CONDITIONAL,  // Conditional (e.g., when ... otherwise ...)
-    NODE_LOOP,         // Loop (e.g., loop { ... })
-    NODE_ASSIGNMENT,   // Assignment (e.g., plant x = 42)
-    NODE_BLOCK,        // Block of statements (e.g., { ... })
-    NODE_BREAK,        // Break statement
-    NODE_SKIP,         // Skip statement
-    NODE_BINARY_OP,    // Binary operation (e.g., 1 + 2)
-    NODE_NUMBER,       // Numeric literal
-    NODE_IDENTIFIER    // Identifier (e.g., x)
+    NODE_PROGRAM,
+    NODE_CONDITIONAL,
+    NODE_LOOP,
+    NODE_ASSIGNMENT,
+    NODE_BLOCK,
+    NODE_BREAK,
+    NODE_CONTINUE,  // Add this line
+    NODE_BINARY_OP,
+    NODE_NUMBER,
+    NODE_IDENTIFIER
 } NodeType;
 
 typedef struct ASTNode {
