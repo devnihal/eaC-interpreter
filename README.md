@@ -1,6 +1,14 @@
 # 🚀 eaC (Easy Alternative C) Interpreter  
 
-**👨‍💻 Author:** Mohammed Nihal ([@devnihal](https://github.com/devnihal))  
+## 👥 Authors & Team  
+
+### 🏆 Lead Developer  
+- **👨‍💻 Mohammed Nihal** ([@devnihal](https://github.com/devnihal)) – **Creator & Lead Developer** 🚀  
+
+### 💻 Development Team  
+- **👩‍💻 Nadha** ([@nadha24](https://github.com/nadha24)) – Co-Developer 💡  
+- **👩‍💻 Sanha** ([@sanha50](https://github.com/sanha50)) – Co-Developer 🔥  
+
 
 ## 📌 Introduction  
 
