@@ -7,7 +7,6 @@
 
 ### 💻 Development Team  
 - **👩‍💻 Nadha** ([@nadha24](https://github.com/nadha24)) – Co-Developer 💡  
-- **👩‍💻 Sanha** ([@sanha50](https://github.com/sanha50)) – Co-Developer 🔥  
 
 
 ## 📌 Introduction  
