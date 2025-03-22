@@ -3,7 +3,7 @@
 ## 👥 Authors & Team  
 
 ### 🏆 Lead Developer  
-- **👨‍💻 Mohammed Nihal** ([@devnihal](https://github.com/devnihal)) – **Creator & Lead Developer** 🚀  
+- **👨🏻‍💻 Mohammed Nihal** ([@devnihal](https://github.com/devnihal)) – **Creator & Lead Developer** 🚀  
 
 ### 💻 Development Team  
 -  **👩🏻‍💻Fathima Nadha** ([@nadha24](https://github.com/nadha24)) – Co-Developer 💡
