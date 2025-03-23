@@ -10,7 +10,7 @@
 
 -  **🧑🏻‍💻 Ajai Bhaskar** ([@ajaiaju39](https://github.com/ajaiaju39)) – Co-Developer 💡  
 
-
+-  **👩🏻‍💻 Nihla PN** ([@nihla42](https://github.com/nihla42)) - Co-Developer 💡
 ## 📌 Introduction  
 
 **eaC (Easy Alternative C)** is a lightweight, dynamically-typed programming language inspired by **C and Python**, designed for simplicity and ease of use. This project focuses on building an **interpreter for eaC in pure C**, without external libraries. The goal is to develop a **structured, extensible, and efficient interpreter** that supports both **interactive execution (REPL)** and **script execution (.eac files)**.
