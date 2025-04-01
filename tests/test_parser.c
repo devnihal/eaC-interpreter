@@ -5,18 +5,30 @@
 #include <stdlib.h>
 
 int main() {
-    // Test source code with new comparison operators
+    // Test source code with logical operators
     const char *source_code = 
         "plant x = 5;"
         "plant y = 10;"
-        "when x >= 5 {"
-            "plant a = 1;"
+        "plant z = 15;"
+        
+        // Test AND operator
+        "when x >= 5 && y <= 10 {"
+            "plant a = 1;"  // Should be 1 (both conditions true)
         "}"
-        "when y <= 10 {"
-            "plant b = 2;"
+        
+        // Test OR operator
+        "when x > 10 || y == 10 {"
+            "plant b = 2;"  // Should be 2 (second condition true)
         "}"
-        "when x != y {"
-            "plant c = 3;"
+        
+        // Test NOT operator
+        "when !(x > 10) {"
+            "plant c = 3;"  // Should be 3 (condition false, so NOT makes it true)
+        "}"
+        
+        // Test complex logical expression
+        "when (x >= 5 && y <= 10) || z == 15 {"
+            "plant d = 4;"  // Should be 4 (first part true)
         "}";
 
     // Tokenize

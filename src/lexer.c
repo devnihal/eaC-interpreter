@@ -56,12 +56,14 @@ Token *lex(const char *source) {
         }
 
         // Check for operators
-        if (strchr("><=!+-*/", *ptr)) {
+        if (strchr("><=!+-*/&|", *ptr)) {
             // Check for multi-character operators
             if ((*ptr == '=' && *(ptr + 1) == '=') || 
                 (*ptr == '!' && *(ptr + 1) == '=') ||
                 (*ptr == '>' && *(ptr + 1) == '=') ||
-                (*ptr == '<' && *(ptr + 1) == '=')) {
+                (*ptr == '<' && *(ptr + 1) == '=') ||
+                (*ptr == '&' && *(ptr + 1) == '&') ||
+                (*ptr == '|' && *(ptr + 1) == '|')) {
                 tokens[token_count].type = TOKEN_OPERATOR;
                 tokens[token_count].value = strndup(ptr, 2);
                 ptr += 2;

@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Iinclude
+CFLAGS = -Wall -Wextra -Iinclude -g -DDEBUG
 SRC_DIR = src
 TEST_DIR = tests
 INC_DIR = include
@@ -23,8 +23,8 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 $(TARGET): $(OBJ_FILES)
 	$(CC) $(CFLAGS) -o $@ $^
 
-test: $(TEST_DIR)/test_parser.c $(OBJ_FILES)
-	$(CC) $(CFLAGS) $^ -o $(TEST_TARGET)
+test: $(OBJ_DIR) $(TEST_DIR)/test_parser.c $(OBJ_FILES)
+	$(CC) $(CFLAGS) $(TEST_DIR)/test_parser.c $(OBJ_FILES) -o $(TEST_TARGET)
 	.\$(TEST_TARGET)
 
 clean:

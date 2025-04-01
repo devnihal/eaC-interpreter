@@ -48,8 +48,9 @@ typedef struct ASTNode {
             struct ASTNode *left;
             struct ASTNode *right;
             char operator;
-            int is_compound;         // New field for compound operators
-            char second_char;        // New field for second character
+            int is_compound;         // For compound operators
+            char second_char;        // For compound operators
+            int is_logical;          // For logical operators
         } binary_op;
 
         char *identifier;    // For identifiers
