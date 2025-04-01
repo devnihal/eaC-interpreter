@@ -1,17 +1,35 @@
 CC = gcc
-CFLAGS = -Wall -Iinclude
-SRC = src/lexer.c src/parser.c src/runtime.c
-TEST_SRC = tests/test_parser.c
-OBJ = $(SRC:.c=.o)
-TARGET = eaC
+CFLAGS = -Wall -Wextra -Iinclude
+SRC_DIR = src
+TEST_DIR = tests
+INC_DIR = include
+OBJ_DIR = obj
 
-all: $(TARGET)
+SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
+OBJ_FILES = $(SRC_FILES:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+TEST_FILES = $(wildcard $(TEST_DIR)/*.c)
 
-$(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
+TARGET = eaC.exe
+TEST_TARGET = test_parser.exe
 
-test-parser:
-	$(CC) $(CFLAGS) $(TEST_SRC) $(SRC) -o test_parser && ./test_parser
+all: $(OBJ_DIR) $(TARGET)
+
+$(OBJ_DIR):
+	if not exist $(OBJ_DIR) mkdir $(OBJ_DIR)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(TARGET): $(OBJ_FILES)
+	$(CC) $(CFLAGS) -o $@ $^
+
+test: $(TEST_DIR)/test_parser.c $(OBJ_FILES)
+	$(CC) $(CFLAGS) $^ -o $(TEST_TARGET)
+	.\$(TEST_TARGET)
 
 clean:
-	rm -f $(OBJ) $(TARGET) test_parser
+	if exist $(OBJ_DIR) rmdir /s /q $(OBJ_DIR)
+	if exist $(TARGET) del $(TARGET)
+	if exist $(TEST_TARGET) del $(TEST_TARGET)
+
+.PHONY: all clean test

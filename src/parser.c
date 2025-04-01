@@ -73,7 +73,17 @@ ASTNode *parse_expression(Token **tokens) {
 
         ASTNode *node = malloc(sizeof(ASTNode));
         node->type = NODE_BINARY_OP;
-        node->binary_op.operator = current->value[0];
+        
+        // Handle two-character operators
+        if (strlen(current->value) == 2) {
+            node->binary_op.operator = current->value[0];
+            node->binary_op.is_compound = 1;  // Mark as compound operator
+            node->binary_op.second_char = current->value[1];
+        } else {
+            node->binary_op.operator = current->value[0];
+            node->binary_op.is_compound = 0;
+        }
+
         (*tokens)++;
         node->binary_op.left = left;
         node->binary_op.right = parse_expression(tokens);

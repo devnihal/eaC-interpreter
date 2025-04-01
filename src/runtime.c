@@ -49,9 +49,27 @@ double interpret_expression(ASTNode *node, Environment *env) {
             return node->number;
         case NODE_IDENTIFIER:
             return get_variable(env, node->identifier);
-        case NODE_BINARY_OP:
+        case NODE_BINARY_OP: {
             double left = interpret_expression(node->binary_op.left, env);
             double right = interpret_expression(node->binary_op.right, env);
+            
+            // Handle compound operators
+            if (node->binary_op.is_compound) {
+                switch (node->binary_op.operator) {
+                    case '>': return (node->binary_op.second_char == '=') ? 
+                                   (left >= right ? 1 : 0) : (left > right ? 1 : 0);
+                    case '<': return (node->binary_op.second_char == '=') ? 
+                                   (left <= right ? 1 : 0) : (left < right ? 1 : 0);
+                    case '!': return (node->binary_op.second_char == '=') ? 
+                                   (left != right ? 1 : 0) : 0;
+                    default:
+                        fprintf(stderr, "Error: Unsupported compound operator '%c%c'\n", 
+                                node->binary_op.operator, node->binary_op.second_char);
+                        exit(1);
+                }
+            }
+            
+            // Handle simple operators
             switch (node->binary_op.operator) {
                 case '+': return left + right;
                 case '-': return left - right;
@@ -64,6 +82,7 @@ double interpret_expression(ASTNode *node, Environment *env) {
                     fprintf(stderr, "Error: Unsupported operator '%c'\n", node->binary_op.operator);
                     exit(1);
             }
+        }
         default:
             fprintf(stderr, "Error: Unsupported expression type\n");
             exit(1);

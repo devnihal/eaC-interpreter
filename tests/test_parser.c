@@ -5,10 +5,22 @@
 #include <stdlib.h>
 
 int main() {
-    // Example source code
-    const char *source_code = "plant z = 0; loop { plant z = z + 1; when z == 5 { continue; } plant w = z; break; }";
+    // Test source code with new comparison operators
+    const char *source_code = 
+        "plant x = 5;"
+        "plant y = 10;"
+        "when x >= 5 {"
+            "plant a = 1;"
+        "}"
+        "when y <= 10 {"
+            "plant b = 2;"
+        "}"
+        "when x != y {"
+            "plant c = 3;"
+        "}";
+
     // Tokenize
-    Token *tokens = lex(source_code); // Use lex() instead of tokenize()
+    Token *tokens = lex(source_code);
 
     // Parse
     ASTNode *ast = parse(tokens);
