@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Main test function for logical operators (&&, ||, !) and comparison operators (>=, <=, !=)
+// Tests both simple and complex conditional expressions
 int main() {
     // Test source code with logical operators
     const char *source_code = 
