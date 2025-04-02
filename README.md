@@ -1,4 +1,4 @@
-kk# 🚀 eaC (Easy Alternative C) Interpreter  
+# 🚀 eaC (Easy Alternative C) Interpreter  
 
 ## 👥 Authors & Team  
 
