@@ -44,14 +44,96 @@ double get_variable(Environment *env, const char *name) {
 }
 // Evaluate expressions
 double interpret_expression(ASTNode *node, Environment *env) {
+    if (!node) {
+        fprintf(stderr, "Error: Null node in expression\n");
+        exit(1);
+    }
+
     switch (node->type) {
         case NODE_NUMBER:
             return node->number;
         case NODE_IDENTIFIER:
             return get_variable(env, node->identifier);
-        case NODE_BINARY_OP:
+        case NODE_BINARY_OP: {
+            // For NOT operator, we only need the right operand
+            if (node->binary_op.is_logical && node->binary_op.operator == '!') {
+                if (!node->binary_op.right) {
+                    fprintf(stderr, "Error: Missing right operand for NOT operator\n");
+                    exit(1);
+                }
+                double right = interpret_expression(node->binary_op.right, env);
+                return (right == 0) ? 1 : 0;
+            }
+
+            // For all other operators, we need both operands
+            if (!node->binary_op.left || !node->binary_op.right) {
+                fprintf(stderr, "Error: Missing operand in binary operation\n");
+                exit(1);
+            }
+
             double left = interpret_expression(node->binary_op.left, env);
             double right = interpret_expression(node->binary_op.right, env);
+            
+            // Handle logical operators first
+            // First evaluate compound operators
+            double result;
+            if (node->binary_op.is_compound) {
+                switch (node->binary_op.operator) {
+                    case '>':
+                        result = (node->binary_op.second_char == '=') ? (left >= right) : (left > right);
+                        break;
+                    case '<':
+                        result = (node->binary_op.second_char == '=') ? (left <= right) : (left < right);
+                        break;
+                    case '!':
+                        result = (node->binary_op.second_char == '=') ? (left != right) : (!right);
+                        break;
+                    case '=':
+                        result = (node->binary_op.second_char == '=') ? (left == right) : 0;
+                        break;
+                    default:
+                        fprintf(stderr, "Error: Unsupported compound operator '%c%c'\n", 
+                                node->binary_op.operator, node->binary_op.second_char);
+                        exit(1);
+                }
+                return result ? 1 : 0;
+            }
+
+            // Then evaluate logical operators
+            if (node->binary_op.is_logical) {
+                // Convert numeric values to boolean (0 is false, non-zero is true)
+                int left_bool = (left != 0);
+                int right_bool = (right != 0);
+                
+                switch (node->binary_op.operator) {
+                    case '&': return (left_bool && right_bool) ? 1 : 0;  // AND
+                    case '|': return (left_bool || right_bool) ? 1 : 0;  // OR
+                    case '!': return (!right_bool) ? 1 : 0;  // NOT (unary)
+                    default:
+                        fprintf(stderr, "Error: Unknown logical operator '%c'\n", node->binary_op.operator);
+                        exit(1);
+                }
+            }
+            
+            // Handle compound operators
+            if (node->binary_op.is_compound) {
+                switch (node->binary_op.operator) {
+                    case '>': return (node->binary_op.second_char == '=') ? 
+                                   (left >= right ? 1 : 0) : (left > right ? 1 : 0);
+                    case '<': return (node->binary_op.second_char == '=') ? 
+                                   (left <= right ? 1 : 0) : (left < right ? 1 : 0);
+                    case '!': return (node->binary_op.second_char == '=') ? 
+                                   (left != right ? 1 : 0) : (!right ? 1 : 0);
+                    case '=': return (node->binary_op.second_char == '=') ? 
+                                   (left == right ? 1 : 0) : 0;
+                    default:
+                        fprintf(stderr, "Error: Unsupported compound operator '%c%c'\n", 
+                                node->binary_op.operator, node->binary_op.second_char);
+                        exit(1);
+                }
+            }
+            
+            // Handle simple operators
             switch (node->binary_op.operator) {
                 case '+': return left + right;
                 case '-': return left - right;
@@ -64,6 +146,7 @@ double interpret_expression(ASTNode *node, Environment *env) {
                     fprintf(stderr, "Error: Unsupported operator '%c'\n", node->binary_op.operator);
                     exit(1);
             }
+        }
         default:
             fprintf(stderr, "Error: Unsupported expression type\n");
             exit(1);

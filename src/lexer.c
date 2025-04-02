@@ -1,4 +1,5 @@
 #include "lexer.h"
+#include "utils.h"
 
 // Helper function to check if a character is a valid identifier start
 int is_identifier_start(char c) {
@@ -55,16 +56,20 @@ Token *lex(const char *source) {
         }
 
         // Check for operators
-        if (strchr("><=!+-*/", *ptr)) {
+        if (strchr("><=!+-*/&|", *ptr)) {
             // Check for multi-character operators
             if ((*ptr == '=' && *(ptr + 1) == '=') || 
-                (*ptr == '!' && *(ptr + 1) == '=')) {
+                (*ptr == '!' && *(ptr + 1) == '=') ||
+                (*ptr == '>' && *(ptr + 1) == '=') ||
+                (*ptr == '<' && *(ptr + 1) == '=') ||
+                (*ptr == '&' && *(ptr + 1) == '&') ||
+                (*ptr == '|' && *(ptr + 1) == '|')) {
                 tokens[token_count].type = TOKEN_OPERATOR;
-                tokens[token_count].value = strndup(ptr, 2); // Capture 2 characters
-                ptr += 2; // Advance by 2
+                tokens[token_count].value = strndup(ptr, 2);
+                ptr += 2;
             } else {
                 tokens[token_count].type = TOKEN_OPERATOR;
-                tokens[token_count].value = strndup(ptr, 1); // Capture 1 character
+                tokens[token_count].value = strndup(ptr, 1);
                 ptr++;
             }
             token_count++;

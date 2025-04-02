@@ -1,0 +1,40 @@
+Folder PATH listing for volume Windows-SSD
+Volume serial number is 2439-482E
+C:.
+¦   .gitignore
+¦   Makefile
+¦   README.md
+¦   test_parser
+¦   tree.txt
+¦   
++---examples
+¦       functions.eac
+¦       hello.eac
+¦       loops.eac
+¦       modules.eac
+¦       
++---include
+¦       ast.h
+¦       common.h
+¦       error.h
+¦       lexer.h
+¦       parser.h
+¦       runtime.h
+¦       types.h
+¦       
++---src
+¦       ast.c
+¦       lexer.c
+¦       parser.c
+¦       runtime.c
+¦       shell.c
+¦       shell.h
+¦       utils.c
+¦       utils.h
+¦       
++---tests
+        test_lexer.c
+        test_parser.c
+        test_runtime.c
+        test_utils.c
+        

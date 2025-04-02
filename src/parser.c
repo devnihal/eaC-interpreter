@@ -46,34 +46,82 @@ ASTNode *parse(Token *tokens) {
 // Parse a single expression (e.g., x + 5)
 ASTNode *parse_expression(Token **tokens) {
     Token *current = (*tokens);
+    ASTNode *left = NULL;
 
-    // Parse left-hand side (identifier or number)
-    ASTNode *left = malloc(sizeof(ASTNode));
-    if (match_token(current, TOKEN_IDENTIFIER, NULL)) {
-        left->type = NODE_IDENTIFIER;
-        left->identifier = strdup(current->value);
-        (*tokens)++;
-    } else if (match_token(current, TOKEN_NUMBER, NULL)) {
-        left->type = NODE_NUMBER;
-        left->number = atof(current->value);
-        (*tokens)++;
+    // Handle parentheses
+    if (match_token(current, TOKEN_PUNCTUATION, "(")) {
+        (*tokens)++; // Skip '('
+        left = parse_expression(tokens);
+        current = (*tokens);
+        if (!match_token(current, TOKEN_PUNCTUATION, ")")) {
+            fprintf(stderr, "Error: Expected closing parenthesis");
+            exit(1);
+        }
+        (*tokens)++; // Skip ')'
+        current = (*tokens);
+    } else if (match_token(current, TOKEN_OPERATOR, "!")) {
+        // Handle unary operators (like NOT)
+        (*tokens)++; // Skip '!'
+        ASTNode *node = malloc(sizeof(ASTNode));
+        node->type = NODE_BINARY_OP;
+        node->binary_op.is_logical = 1;
+        node->binary_op.operator = '!';
+        node->binary_op.left = NULL;
+        node->binary_op.right = parse_expression(tokens);
+        return node;
     } else {
-        fprintf(stderr, "Error: Expected identifier or number\n");
-        exit(1);
+        // Parse left-hand side (identifier or number)
+        left = malloc(sizeof(ASTNode));
+        if (match_token(current, TOKEN_IDENTIFIER, NULL)) {
+            left->type = NODE_IDENTIFIER;
+            left->identifier = strdup(current->value);
+            (*tokens)++;
+        } else if (match_token(current, TOKEN_NUMBER, NULL)) {
+            left->type = NODE_NUMBER;
+            left->number = atof(current->value);
+            (*tokens)++;
+        } else {
+            fprintf(stderr, "Error: Expected identifier or number\n");
+            exit(1);
+        }
     }
 
     // Check for binary operators
     current = (*tokens);
     while (match_token(current, TOKEN_OPERATOR, NULL)) {
+        ASTNode *node = malloc(sizeof(ASTNode));
+        node->type = NODE_BINARY_OP;
+        
         // Reject '=' in expressions (only allowed in assignments)
-        if (strcmp(current->value, "=") == 0) {
+        if (strcmp(current->value, "=") == 0 && current->value[1] != '=') {
             fprintf(stderr, "Error: '=' is not allowed in expressions\n");
             exit(1);
         }
 
-        ASTNode *node = malloc(sizeof(ASTNode));
-        node->type = NODE_BINARY_OP;
-        node->binary_op.operator = current->value[0];
+        // Initialize flags
+        node->binary_op.is_logical = 0;
+        node->binary_op.is_compound = 0;
+        
+        // Handle logical operators and compound operators
+        if (strcmp(current->value, "&&") == 0 || strcmp(current->value, "||") == 0) {
+            node->binary_op.is_logical = 1;
+            node->binary_op.operator = current->value[0];
+            node->binary_op.second_char = current->value[1];
+        } else if (strcmp(current->value, "!") == 0) {
+            node->binary_op.is_logical = 1;
+            node->binary_op.operator = '!';
+        } else if (strcmp(current->value, "==") == 0) {
+            node->binary_op.is_compound = 1;
+            node->binary_op.operator = '=';
+            node->binary_op.second_char = '=';
+        } else if (strlen(current->value) == 2) {
+            node->binary_op.is_compound = 1;
+            node->binary_op.operator = current->value[0];
+            node->binary_op.second_char = current->value[1];
+        } else {
+            node->binary_op.operator = current->value[0];
+        }
+
         (*tokens)++;
         node->binary_op.left = left;
         node->binary_op.right = parse_expression(tokens);
